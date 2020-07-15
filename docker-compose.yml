@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  api_geo:
+    image: ${DOCKER_REGISTRY-}apigeo
+    build:
+      context: .
+      dockerfile: Api_Geo/Dockerfile
+    depends_on :
+           - rabbitmq
+           - sqldata
+
+  geocodificadorservice:
+    image: ${DOCKER_REGISTRY-}geocodificadorservice
+    build:
+      context: .
+      dockerfile: GeocodificadorService/Dockerfile
+    depends_on :
+           - rabbitmq
+
+
+  rabbitmq:
+        image: rabbitmq:3-management-alpine
+        container_name: rabbitmq        
+        environment:
+            RABBITMQ_DEFAULT_USER: user
+            RABBITMQ_DEFAULT_PASS: password  
+        ports:
+            - 15672:15672
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:2017-latest 
+    environment:
+      - SA_PASSWORD=Pass@word
+      - ACCEPT_EULA=Y
+    ports:
+      - "5433:1433"
